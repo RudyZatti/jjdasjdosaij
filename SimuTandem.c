@@ -1,5 +1,5 @@
 #include <stdio.h>
-double evento(double *x, int tMin, int tMax, int *counter);
+double evento(double *x, int tMin, int tMax, int *counter, int totalGens);
 int genNext(int num);
 
 struct Atendente{
@@ -32,7 +32,7 @@ int main(){
                 clientesPerdidos++; //Cliente Perdido
             else
                 emFilaA++; //Adiciona o cliente que recém chegou na fila
-            nextChegada = evento(&current_X, 1, 4, &count); //Agenda a próxima
+            nextChegada = evento(&current_X, 1, 4, &count, totalGens); //Agenda a próxima
         }
         
         if(a1.tAtendimento == 0.0){ //Término do atendimento do a1
@@ -58,15 +58,15 @@ int main(){
         }
             
         if(b1.tAtendimento == -1.0 && emFilaB > 0)
-            b1.tAtendimento = evento(&current_X, b1.tMin, b1.tMax, &count);
+            b1.tAtendimento = evento(&current_X, b1.tMin, b1.tMax, &count, totalGens);
 
         if ((a1.tAtendimento == -1 && emFilaA > 0))
             if(!(a2.tAtendimento > -1 && emFilaA == 1))
-                a1.tAtendimento = evento(&current_X, a1.tMin, a1.tMax, &count);
+                a1.tAtendimento = evento(&current_X, a1.tMin, a1.tMax, &count, totalGens);
         //Tem 2 IFs pra garantir que o a1 não começe a atender um cliente que já esteja com o a2
         
         if (a2.tAtendimento == -1.0 && emFilaA > 1)
-            a2.tAtendimento = evento(&current_X, a2.tMin, a2.tMax, &count);
+            a2.tAtendimento = evento(&current_X, a2.tMin, a2.tMax, &count, totalGens);
         
         //Abaixo acontece a progressão do tempo.
         double nextTempo;
@@ -76,7 +76,9 @@ int main(){
                 nextTempo = a2.tAtendimento;
             else
                 nextTempo = a1.tAtendimento;
-        }else
+        }else if(a2.tAtendimento > 0.0 && a2.tAtendimento <= nextChegada)
+            nextTempo = a2.tAtendimento;
+        else
             nextTempo = nextChegada;
         
         if(a1.tAtendimento > -1.0)
@@ -87,6 +89,8 @@ int main(){
         
         nextChegada -= nextTempo;
         tempo += nextTempo;
+
+        //Registra se o tempo passado foi ocioso ou não
         if(a1.tAtendimento > -1.0 || a2.tAtendimento > -1.0)
             tempoAtendendo += nextTempo;
         else
@@ -99,11 +103,11 @@ int main(){
     return 0;
 }
 
-double evento(double *x, int tMin, int tMax, int *counter){
-    //tMin = 2 -> chegada
-    //tMin = 3 -> saida
+double evento(double *x, int tMin, int tMax, int *counter, int totalGens){
     *x = genNext(*x*100)/100.0;
     (*counter)++;
+    if(*counter >= totalGens) {return -100.0;}
+    printf("%f\n", *x);
     return (tMin + (*x*(tMax - tMin)));
 }
 
@@ -113,6 +117,3 @@ int genNext(int num){
     const int a = 7;
     return ((a * num) + c) % M;
 }
-
-
-
