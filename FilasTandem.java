@@ -22,10 +22,13 @@ class FilasTandem{
 
         double tempo = 0.0;
         int clientesPerdidos = 0;
+        int clientesPerdidosB = 0;
         final int maxFilaA = 3;
         final int maxFilaB = 5;
         double tempoAtendendo = 0.0;
         double tempoOcioso = 0.0;
+        double tempoOciosoB = 0.0;
+        double tempoAtendendoB = 0.0;
         Atendente a1 = new Atendente(4.0, 3.0);
         Atendente a2 = new Atendente(4.0, 3.0);
         Atendente b1 = new Atendente(3.0, 2.0);
@@ -61,7 +64,7 @@ class FilasTandem{
                 }
 
                 if (emFilaB > maxFilaB) {
-                    clientesPerdidos += emFilaB - maxFilaB;
+                    clientesPerdidosB += emFilaB - maxFilaB;
                     emFilaB = maxFilaB;
                 }
 
@@ -101,6 +104,11 @@ class FilasTandem{
                     tempoAtendendo += nextTempo;
                 else
                     tempoOcioso += nextTempo;
+
+                if (b1.tAtendimento > -1.0)
+                    tempoAtendendoB += nextTempo;
+                else
+                    tempoOciosoB += nextTempo;
             }
             writer.close();
         }catch(Exception e){
@@ -111,6 +119,9 @@ class FilasTandem{
         System.out.println("Clientes perdidos: " + clientesPerdidos);
         System.out.println("Tempo atendendo: " + tempoAtendendo);
         System.out.println("Tempo ocioso: " + tempoOcioso);
+        System.out.println("Tempo atendendo fila 2: " + tempoAtendendoB);
+        System.out.println("Tempo ocioso fila 2: " + tempoOciosoB);
+        System.out.println("Clientes perdidos fila 2: " + clientesPerdidosB);
     }
 
     private static double evento(double tMin, double tMax, int totalGens, FileWriter writer) throws Exception {
